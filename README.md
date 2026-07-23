@@ -4,7 +4,7 @@ This project implements a Bronze → Silver → Gold medallion architecture in A
 📂 Prerequisites
 Access to an Azure Databricks workspace
 
-A mounted ADLS Gen2 container (or local /mnt/ paths for simulation)
+A mounted Unity Catalog container (or local  paths for simulation)
 
 Python 3.9+ runtime with PySpark
 
@@ -19,7 +19,7 @@ This will:
 
 Pull data from the ArcGIS FeatureServer API
 
-Save raw JSON payload to /mnt/bronze/university_chapters/<run_id>/
+Save raw JSON payload to /Volumes/azure-medallion-university-chapters/bronze/university_chapters<run_id>/
 
 Print the run_id for this ingest
 
@@ -51,7 +51,7 @@ This will:
 
 Read Silver data
 
-Publish consumer-facing Gold dataset to /mnt/gold/university_chapters/v1/
+Publish consumer-facing Gold dataset to /Volumes/azure-medallion-university-chapters/gold/university_chapters
 
 Exclude quarantined rows, include OK + WARNING rows
 
