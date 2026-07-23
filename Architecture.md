@@ -1,51 +1,51 @@
 🏗️ Architecture Note
-This project implements the Azure Medallion Architecture for the University Chapters dataset using Azure Databricks and Azure Data Lake Storage (ADLS Gen2).
+This project implements the Azure Medallion Architecture for the University Chapters dataset using Azure Databricks with Unity Catalog managed tables.
 
 🔹 Layers
-Bronze
+Bronze (Raw Landing)
 
-Raw API payload from ArcGIS FeatureServer
+Ingests API payload from ArcGIS FeatureServer.
 
-Stored in /mnt/bronze/university_chapters/<run_id>/
+Stored as managed table: catalog.bronze.university_chapters_<run_id>.
 
-Includes ingest metadata (run_id, timestamp)
+Includes ingest metadata (run_id, timestamp).
 
-Silver
+Silver (Cleaned & Typed)
 
-Flattened, typed dataset
+Flattened, typed dataset.
 
 Data Quality applied:
 
-DQ-Q1 → invalid coordinates → quarantined
+DQ-Q1 → invalid coordinates → quarantined table.
 
-DQ-W1 → missing/unknown city → warning
+DQ-W1 → missing/unknown city → warning flag.
 
-Stored in /mnt/silver/university_chapters/
+Stored as managed table: catalog.silver.university_chapters.
 
-Gold
+Gold (Published Data Product)
 
-Consumer-facing dataset
+Consumer-facing dataset.
 
-Contains only OK + WARNING rows
+Contains only OK + WARNING rows.
 
-Stored in /mnt/gold/university_chapters/v1/
+Stored as managed table: catalog.gold.university_chapters_v1.
 
 Quarantine
 
-Invalid rows separated for debugging
+Invalid rows separated for debugging.
 
-Stored in /mnt/quarantine/university_chapters/<run_id>/
+Stored as managed table: catalog.quarantine.university_chapters_<run_id>.
 
 🔹 Chosen Tech
-Compute: Azure Databricks (PySpark notebooks)
+Concern	          Technology
+Compute	          Azure Databricks (PySpark notebooks)
+Storage	          Unity Catalog managed tables (governed lakehouse)
+Orchestration	Databricks Jobs workflow (Bronze → Silver → Gold)
+Governance	Unity Catalog for access control, lineage, and schema enforcement
+Logging	          Row counts per run (in, quarantined, warned, ok)
+Contract	          Markdown file defining schema, SLA, DQ rules, versioning
 
-Storage: ADLS Gen2 (mounted /mnt/ paths)
 
-Orchestration: Databricks Jobs workflow (Bronze → Silver → Gold)
-
-Logging: Row counts per run (in, quarantined, warned, ok)
-
-Contract: Markdown file defining schema, SLA, DQ rules, versioning
 
           +-------------------+
           | ArcGIS API Source |
@@ -60,7 +60,7 @@ Contract: Markdown file defining schema, SLA, DQ rules, versioning
                    v
         +-----------------------+
         | Silver Layer (Clean)  |
-        | /mnt/silver/          |
+        | /valume/silver/          |
         | DQ-Q1 → Quarantine    |
         | DQ-W1 → Warning       |
         +-----------------------+
